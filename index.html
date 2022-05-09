@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Simplex iterator</title>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="rows" value=0>
+        <input type="text" id="col" value=0>
+        <button class='btn' id="generate">Generate</button>
+    </div>
+    <div class="container">
+        <table id="tableInput">
+            
+        </table>
+        <button id='iterator'>Iterate</button>
+    </div>
+    <div class="container" id='output'>
+
+    </div>
+</body>
+<script>
+    let arr=[],rows,col,iter=0;
+    document.getElementById('generate').addEventListener('click',function(){
+        var table=document.getElementById('tableInput');
+        rows=document.getElementById('rows').value;
+        col=document.getElementById('col').value;
+       
+        for(let i=0;i<rows;i++){
+            var addRow=table.insertRow(i);
+            for(let j=0;j<col;j++){
+                var cell=addRow.insertCell(j);
+                
+                cell.innerHTML="<input type='text' class=inputVal id=in"+i+""+j+" value=0>";
+            }
+            
+        }
+        
+    })
+    document.getElementById('iterator').addEventListener('click',function(){
+        if(!iter){
+            var cellInputs=document.getElementsByClassName("inputVal");
+        let a=[];
+        for(let i=0;i<cellInputs.length;i++){
+            a.push(parseFloat(cellInputs[i].value));
+            if(i!=0 && (i+1)%(col)==0){
+                //console.log(a);
+                arr.push(a);
+                a=[];
+            }
+        }
+        }
+        iter++;
+        //finding pivot col
+        var pc,min=1000,pivotCol=[];
+        for(let j=0;j<arr[0].length-1;j++){
+            if(arr[0][j]<0 && arr[0][j]<min){
+                min=arr[0][j];
+                pc=j;
+            }
+        }
+        var lr=100000000000,r=[],pr,pivotRow=[];
+        //finding pivot row;
+        for(let k=0;k<arr.length;k++){
+            var ratio;
+            if(arr[k][pc]!=0){
+                ratio=arr[k][col-1]/arr[k][pc];
+            }
+            else{
+                ratio=1000000000;
+            }
+            r.push(ratio);
+            pivotCol.push(arr[k][pc]);
+            if(k>0 && ratio>0 && ratio<lr){
+                lr=ratio;
+                pr=k;
+            }
+        }
+        console.log();
+        for(let i=0;i<col;i++){
+            pivotRow.push(arr[pr][i]);
+        }
+        console.log(pivotRow,pivotCol);
+        document.getElementById('output').innerHTML+="Row "+pr+" leaves and Col"+pc+" enters"
+        //console.log("Row "+pr+1+" leaves and Col"+pc+1+" enters");
+        let changedPivotRow=[]
+        let c=arr[pr][pc];
+        for(let i=0;i<col;i++){
+            arr[pr][i]=arr[pr][i]/c;
+            changedPivotRow.push(arr[pr][i]);
+        }
+        for(let j=0;j<rows;j++){
+            if(j!=pr){
+                for(let k=0;k<col;k++){
+                    arr[j][k]=arr[j][k]-pivotCol[j]*changedPivotRow[k];
+                }
+            }
+        }
+        console.log(arr,changedPivotRow);
+        var dis='';
+        for(let i=0;i<arr.length;i++){
+            var gc='';
+            for(let j=0;j<col;j++){
+                gc+='<div class="col-sm">'+arr[i][j]+'</div>';
+            }
+            dis+='<div class="row">'+gc+'</div>';
+        }
+        document.getElementById('output').innerHTML+=dis;
+
+    })
+</script>
+</html>
